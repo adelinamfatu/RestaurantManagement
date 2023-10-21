@@ -1,5 +1,6 @@
 package ro.ase.classes;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class Order {
         this.orderItems = new ArrayList<>();
     }
 
-    public void addItem(Product product, int quantity) {
+    public void addItem(Product product, int quantity) throws ParseException {
         OrderItem item = new OrderItem(product, quantity);
         orderItems.add(item);
     }
