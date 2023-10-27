@@ -1,17 +1,28 @@
 package ro.ase.classes;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Order {
     private int id;
     private List<OrderItem> orderItems;
+    private Table table;
+    private Date date;
     private float totalPrice = 0;
 
     public Order(int orderId) {
         this.id = orderId;
         this.orderItems = new ArrayList<>();
+        this.date = new Date();
+    }
+
+    public Date getDate() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        String formattedDate = dateFormat.format(this.date);
+        return dateFormat.parse(formattedDate);
     }
 
     public void addItem(Product product, int quantity) throws ParseException {
