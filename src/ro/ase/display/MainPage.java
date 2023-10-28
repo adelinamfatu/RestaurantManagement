@@ -92,6 +92,25 @@ public class MainPage extends JFrame {
             for (String productName : productNames) {
                 JButton productButton = new JButton(productName);
                 productButton.setFont(new Font("Arial", Font.PLAIN, 50));
+                productButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Font messageFont = new Font("Arial", Font.PLAIN, 35);
+                        UIManager.put("OptionPane.messageFont", messageFont);
+                        UIManager.put("Button.font", messageFont);
+                        UIManager.put("OptionPane.minimumSize", new Dimension(300,200));
+
+                        String popupMessage = MessageDisplayer.getInstance().getMessage("add_product_message");
+                        String popupTitle = MessageDisplayer.getInstance().getMessage("add_product_title");
+                        int result = JOptionPane.showConfirmDialog(MainPage.this, popupMessage, popupTitle, JOptionPane.YES_NO_OPTION);
+
+                        if (result == JOptionPane.YES_OPTION) {
+                            //
+                        } else {
+                            //
+                        }
+                    }
+                });
                 productButtonsPanel.add(productButton);
             }
 
