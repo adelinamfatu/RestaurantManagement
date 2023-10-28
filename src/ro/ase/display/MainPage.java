@@ -1,11 +1,14 @@
 package ro.ase.display;
 import ro.ase.classes.Category;
+import ro.ase.database.SelectDatabase;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.util.Vector;
 
 public class MainPage extends JFrame {
     private JLabel titleLabel;
@@ -13,8 +16,11 @@ public class MainPage extends JFrame {
     private CardLayout cardLayout;
     private JPanel categoryPanel;
     private JPanel categoryButtonsPanel;
+    private Connection connection;
 
-    public MainPage() {
+    public MainPage(Connection connection) {
+        this.connection = connection;
+
         setTitle(MessageDisplayer.getInstance().getMessage("main_page_title"));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setResizable(false);
@@ -63,6 +69,7 @@ public class MainPage extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             JPanel productsPanel = new JPanel();
+            productsPanel.setLayout(new GridLayout(0, 5));
 
             JButton backButton = new JButton(MessageDisplayer.getInstance().getMessage("back_to_categories_button"));
             backButton.setFont(new Font("Arial", Font.PLAIN, 45));
@@ -73,6 +80,16 @@ public class MainPage extends JFrame {
                 }
             });
             productsPanel.add(backButton);
+
+            SelectDatabase selectDatabase = new SelectDatabase(connection);
+            Vector<String> productNames = selectDatabase.getProductNames(categoryName);
+
+            for (String productName : productNames) {
+                JButton productButton = new JButton(productName);
+                productButton.setFont(new Font("Arial", Font.PLAIN, 50));
+                productsPanel.add(productButton);
+            }
+
             mainPanel.add(productsPanel, categoryName);
             cardLayout.show(mainPanel, categoryName);
         }

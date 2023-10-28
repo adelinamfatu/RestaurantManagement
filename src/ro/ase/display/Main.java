@@ -20,6 +20,7 @@ public class Main {
                     "name TEXT NOT NULL, " +
                     "description TEXT, " +
                     "price REAL NOT NULL, " +
+                    "amount INTEGER NOT NULL," +
                     "type TEXT NOT NULL" +
                     ");";
 
@@ -29,14 +30,14 @@ public class Main {
                     "isOccupied INTEGER NOT NULL" +
                     ");";
 
-            String createOrderTableSQL = "CREATE TABLE IF NOT EXISTS OrderTable (" +
+            String createOrderTableSQL = "CREATE TABLE IF NOT EXISTS Orders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "tableId INTEGER NOT NULL, " +
                     "totalPrice REAL NOT NULL, " +
                     "orderDate DATETIME NOT NULL" +
                     ");";
 
-            String createOrderItemTableSQL = "CREATE TABLE IF NOT EXISTS OrderItem (" +
+            String createOrderItemTableSQL = "CREATE TABLE IF NOT EXISTS OrderItems (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "productId INTEGER NOT NULL, " +
                     "quantity INTEGER NOT NULL" +
@@ -49,19 +50,11 @@ public class Main {
             System.out.println("Database tables created or updated successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                MainPage mainPage = new MainPage();
+                MainPage mainPage = new MainPage(connection);
 
                 mainPage.addWindowListener(new WindowAdapter() {
                     @Override
