@@ -12,10 +12,10 @@ import java.util.Vector;
 
 public class MainPage extends JFrame {
     private JLabel titleLabel;
-    private JPanel mainPanel;
+    private JPanel flipPanel;
     private CardLayout cardLayout;
     private JPanel categoryPanel;
-    private JPanel categoryButtonsPanel;
+    private JPanel categoryGrid;
     private Connection connection;
 
     public MainPage(Connection connection) {
@@ -27,7 +27,7 @@ public class MainPage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         cardLayout = new CardLayout();
-        mainPanel = new JPanel(cardLayout);
+        flipPanel = new JPanel(cardLayout);
 
         titleLabel = new JLabel(MessageDisplayer.getInstance().getMessage("main_page_title"));
         titleLabel.setFont(new Font("Arial", Font.BOLD, 50));
@@ -39,24 +39,24 @@ public class MainPage extends JFrame {
 
         categoryPanel = new JPanel(new BorderLayout());
 
-        categoryButtonsPanel = new JPanel(new GridLayout(0, 5));
+        categoryGrid = new JPanel(new GridLayout(0, 5));
         Font buttonFont = new Font("Arial", Font.PLAIN, 50);
 
         for (Category category : Category.values()) {
             JButton categoryButton = new JButton(category.toString());
             categoryButton.setFont(buttonFont);
             categoryButton.addActionListener(new CategoryButtonActionListener(category.toString()));
-            categoryButtonsPanel.add(categoryButton);
+            categoryGrid.add(categoryButton);
         }
 
         categoryPanel.add(titleLabel, BorderLayout.NORTH);
-        categoryPanel.add(categoryButtonsPanel, BorderLayout.CENTER);
+        categoryPanel.add(categoryGrid, BorderLayout.CENTER);
 
-        mainPanel.add(categoryPanel, "CategoryPanel");
+        flipPanel.add(categoryPanel, "CategoryPanel");
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
-        contentPane.add(mainPanel, BorderLayout.CENTER);
+        contentPane.add(flipPanel, BorderLayout.CENTER);
     }
 
     private class CategoryButtonActionListener implements ActionListener {
@@ -68,30 +68,37 @@ public class MainPage extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JPanel productsPanel = new JPanel();
-            productsPanel.setLayout(new GridLayout(0, 5));
+            JPanel productsPanel = new JPanel(new BorderLayout());
 
             JButton backButton = new JButton(MessageDisplayer.getInstance().getMessage("back_to_categories_button"));
             backButton.setFont(new Font("Arial", Font.PLAIN, 45));
             backButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    cardLayout.show(mainPanel, "CategoryPanel");
+                    cardLayout.show(flipPanel, "CategoryPanel");
                 }
             });
-            productsPanel.add(backButton);
+
+            JPanel backButtonPanel = new JPanel();
+            backButtonPanel.add(backButton);
+
+            productsPanel.add(backButtonPanel, BorderLayout.NORTH);
 
             SelectDatabase selectDatabase = new SelectDatabase(connection);
             Vector<String> productNames = selectDatabase.getProductNames(categoryName);
 
+            JPanel productButtonsPanel = new JPanel(new GridLayout(0, 5));
+
             for (String productName : productNames) {
                 JButton productButton = new JButton(productName);
                 productButton.setFont(new Font("Arial", Font.PLAIN, 50));
-                productsPanel.add(productButton);
+                productButtonsPanel.add(productButton);
             }
 
-            mainPanel.add(productsPanel, categoryName);
-            cardLayout.show(mainPanel, categoryName);
+            productsPanel.add(productButtonsPanel, BorderLayout.CENTER);
+
+            flipPanel.add(productsPanel, categoryName);
+            cardLayout.show(flipPanel, categoryName);
         }
     }
 }
