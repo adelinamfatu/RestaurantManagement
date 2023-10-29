@@ -28,4 +28,8 @@ public class Table {
     public boolean isOccupied() {
         return isOccupied;
     }
+
+    public int getNbSeats() {
+        return nbSeats;
+    }
 }

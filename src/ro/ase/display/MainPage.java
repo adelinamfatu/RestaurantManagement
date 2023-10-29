@@ -1,6 +1,5 @@
 package ro.ase.display;
-import ro.ase.classes.Category;
-import ro.ase.classes.Table;
+import ro.ase.classes.*;
 import ro.ase.database.SelectDatabase;
 
 import javax.swing.*;
@@ -21,10 +20,13 @@ public class MainPage extends JFrame {
     private JComboBox<String> cbTable;
     private JCheckBox cbIsOccupied;
     private SelectDatabase selectDatabase;
+    private JTextField tfNbSeats;
+    private JList<OrderItem> orderItems;
 
     public MainPage(Connection connection) {
         this.connection = connection;
         this.selectDatabase = new SelectDatabase(connection);
+        this.orderItems = new JList<>();
 
         setTitle(MessageDisplayer.getInstance().getMessage("main_page_title"));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -55,7 +57,9 @@ public class MainPage extends JFrame {
             categoryPanel.add(categoryButton);
         }
 
-        JPanel controlPanel = new JPanel();
+        JPanel controlPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(5, 5, 5, 5);
 
         cbTable = new JComboBox<>();
         cbTable.setFont(new Font("Arial", Font.PLAIN, 35));
@@ -64,22 +68,49 @@ public class MainPage extends JFrame {
             cbTable.addItem(table.getName());
         }
 
-        cbIsOccupied = new JCheckBox("Is Occupied");
+        cbIsOccupied = new JCheckBox(MessageDisplayer.getInstance().getMessage("is_occupied_checkbox"));
         cbIsOccupied.setFont(new Font("Arial", Font.PLAIN, 35));
         cbTable.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedTableName = (String)cbTable.getSelectedItem();
+                String selectedTableName = (String) cbTable.getSelectedItem();
                 boolean isOccupied = tables.stream()
                         .filter(table -> table.getName().equals(selectedTableName))
                         .findFirst().orElse(null).isOccupied();
                 cbIsOccupied.setSelected(isOccupied);
+
+                int nbSeats = tables.stream()
+                        .filter(table -> table.getName().equals(selectedTableName))
+                        .findFirst().orElse(null).getNbSeats();
+
+                tfNbSeats.setText(String.valueOf(nbSeats));
             }
         });
 
-        controlPanel.add(cbTable);
-        controlPanel.add(cbIsOccupied);
-        controlPanel.setPreferredSize(new Dimension(400, 100));
+        tfNbSeats = new JTextField(5);
+        tfNbSeats.setFont(new Font("Arial", Font.PLAIN, 35));
+        tfNbSeats.setEditable(false);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST; // Align to the left
+        controlPanel.add(cbTable, constraints);
+
+        constraints.gridy = 1;
+        controlPanel.add(cbIsOccupied, constraints);
+
+        constraints.gridy = 2;
+        controlPanel.add(tfNbSeats, constraints);
+
+        orderItems.setFont(new Font("Arial", Font.PLAIN, 35));
+        JScrollPane ordersPane = new JScrollPane(orderItems);
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridheight = 3;
+        constraints.fill = GridBagConstraints.BOTH;
+        controlPanel.add(ordersPane, constraints);
+
+        controlPanel.setPreferredSize(new Dimension(600, 500));
 
         mainContentPanel.add(categoryPanel, BorderLayout.CENTER);
         mainContentPanel.add(controlPanel, BorderLayout.SOUTH);
@@ -116,13 +147,19 @@ public class MainPage extends JFrame {
 
             productsPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-            Vector<String> productNames = selectDatabase.getProductNames(categoryName);
+            List<Product> productDetails = selectDatabase.getProductDetails(categoryName);
 
             JPanel productButtonsPanel = new JPanel(new GridLayout(0, 5));
 
-            for (String productName : productNames) {
-                JButton productButton = new JButton(productName);
-                productButton.setFont(new Font("Arial", Font.PLAIN, 50));
+            for (Product product : productDetails) {
+                String buttonText = "<html><center><b style='font-size:80pt;'>" +
+                        product.getName() + "</b><br>" +
+                        product.getDescription() + "<br>" +
+                        product.getPrice() + " lei<br>" +
+                        product.getAmount() + " gr</center></html>";
+
+                JButton productButton = new JButton(buttonText);
+                productButton.setFont(new Font("Arial", Font.PLAIN, 40));
                 productButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -136,9 +173,7 @@ public class MainPage extends JFrame {
                         int result = JOptionPane.showConfirmDialog(MainPage.this, popupMessage, popupTitle, JOptionPane.YES_NO_OPTION);
 
                         if (result == JOptionPane.YES_OPTION) {
-                            //
-                        } else {
-                            //
+                            //orderItems.add(new OrderItem());
                         }
                     }
                 });

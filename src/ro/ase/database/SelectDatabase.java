@@ -18,11 +18,11 @@ public class SelectDatabase {
         this.connection = connection;
     }
 
-    public Vector<String> getProductNames(String categoryName) {
-        Vector<String> productNames = new Vector<>();
+    public List<Product> getProductDetails(String categoryName) {
+        List<Product> productDetails = new ArrayList<>();
 
         try {
-            String query = "SELECT name FROM Products WHERE type = ?";
+            String query = "SELECT name, description, price, amount FROM Products WHERE type = ?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, categoryName);
@@ -30,7 +30,10 @@ public class SelectDatabase {
 
             while (resultSet.next()) {
                 String name = resultSet.getString("name");
-                productNames.add(name);
+                String description = resultSet.getString("description");
+                float price = resultSet.getFloat("price");
+                int amount = resultSet.getInt("amount");
+                productDetails.add(new Product(name, description, price, amount));
             }
 
             resultSet.close();
@@ -39,7 +42,7 @@ public class SelectDatabase {
             e.printStackTrace();
         }
 
-        return productNames;
+        return productDetails;
     }
 
     public List<Table> getTables() {
