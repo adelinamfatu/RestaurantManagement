@@ -22,6 +22,7 @@ public class MainPage extends JFrame {
     private SelectDatabase selectDatabase;
     private JTextField tfNbSeats;
     private JList<OrderItem> orderItems;
+    private DefaultListModel<OrderItem> orderItemsModel = new DefaultListModel<>();
 
     public MainPage(Connection connection) {
         this.connection = connection;
@@ -93,7 +94,7 @@ public class MainPage extends JFrame {
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.anchor = GridBagConstraints.WEST; // Align to the left
+        constraints.anchor = GridBagConstraints.WEST;
         controlPanel.add(cbTable, constraints);
 
         constraints.gridy = 1;
@@ -103,6 +104,7 @@ public class MainPage extends JFrame {
         controlPanel.add(tfNbSeats, constraints);
 
         orderItems.setFont(new Font("Arial", Font.PLAIN, 35));
+        orderItems.setModel(orderItemsModel);
         JScrollPane ordersPane = new JScrollPane(orderItems);
         constraints.gridx = 1;
         constraints.gridy = 0;
@@ -159,6 +161,7 @@ public class MainPage extends JFrame {
                         product.getAmount() + " gr</center></html>";
 
                 JButton productButton = new JButton(buttonText);
+                productButton.putClientProperty("product", product);
                 productButton.setFont(new Font("Arial", Font.PLAIN, 40));
                 productButton.addActionListener(new ActionListener() {
                     @Override
@@ -173,7 +176,8 @@ public class MainPage extends JFrame {
                         int result = JOptionPane.showConfirmDialog(MainPage.this, popupMessage, popupTitle, JOptionPane.YES_NO_OPTION);
 
                         if (result == JOptionPane.YES_OPTION) {
-                            //orderItems.add(new OrderItem());
+                            Product clickedProduct = (Product) productButton.getClientProperty("product");
+                            orderItemsModel.addElement(new OrderItem(clickedProduct, 1));
                         }
                     }
                 });

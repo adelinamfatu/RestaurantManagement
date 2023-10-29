@@ -16,4 +16,9 @@ public class OrderItem {
     public float calculateSubtotal() {
         return product.getPrice() * quantity;
     }
+
+    @Override
+    public String toString() {
+        return this.product.getName() + " x " + this.quantity + " buc ... " + this.product.getPrice() + " lei";
+    }
 }
