@@ -1,5 +1,6 @@
 package ro.ase.display;
 import ro.ase.classes.Category;
+import ro.ase.classes.Table;
 import ro.ase.database.SelectDatabase;
 
 import javax.swing.*;
@@ -9,17 +10,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.util.Vector;
+import java.util.List;
 
 public class MainPage extends JFrame {
     private JLabel titleLabel;
     private JPanel flipPanel;
     private CardLayout cardLayout;
     private JPanel categoryPanel;
-    private JPanel categoryGrid;
     private Connection connection;
+    private JComboBox<String> cbTable;
+    private JCheckBox cbIsOccupied;
+    private SelectDatabase selectDatabase;
 
     public MainPage(Connection connection) {
         this.connection = connection;
+        this.selectDatabase = new SelectDatabase(connection);
 
         setTitle(MessageDisplayer.getInstance().getMessage("main_page_title"));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -37,22 +42,49 @@ public class MainPage extends JFrame {
         Border spaceAfterTitle = BorderFactory.createEmptyBorder(10, 0, 20, 0);
         titleLabel.setBorder(BorderFactory.createCompoundBorder(spaceBeforeTitle, spaceAfterTitle));
 
-        categoryPanel = new JPanel(new BorderLayout());
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.add(titleLabel, BorderLayout.NORTH);
 
-        categoryGrid = new JPanel(new GridLayout(0, 5));
+        categoryPanel = new JPanel(new GridLayout(0, 5));
         Font buttonFont = new Font("Arial", Font.PLAIN, 50);
 
         for (Category category : Category.values()) {
             JButton categoryButton = new JButton(category.toString());
             categoryButton.setFont(buttonFont);
             categoryButton.addActionListener(new CategoryButtonActionListener(category.toString()));
-            categoryGrid.add(categoryButton);
+            categoryPanel.add(categoryButton);
         }
 
-        categoryPanel.add(titleLabel, BorderLayout.NORTH);
-        categoryPanel.add(categoryGrid, BorderLayout.CENTER);
+        JPanel controlPanel = new JPanel();
 
-        flipPanel.add(categoryPanel, "CategoryPanel");
+        cbTable = new JComboBox<>();
+        cbTable.setFont(new Font("Arial", Font.PLAIN, 35));
+        List<Table> tables = selectDatabase.getTables();
+        for (Table table : tables) {
+            cbTable.addItem(table.getName());
+        }
+
+        cbIsOccupied = new JCheckBox("Is Occupied");
+        cbIsOccupied.setFont(new Font("Arial", Font.PLAIN, 35));
+        cbTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedTableName = (String)cbTable.getSelectedItem();
+                boolean isOccupied = tables.stream()
+                        .filter(table -> table.getName().equals(selectedTableName))
+                        .findFirst().orElse(null).isOccupied();
+                cbIsOccupied.setSelected(isOccupied);
+            }
+        });
+
+        controlPanel.add(cbTable);
+        controlPanel.add(cbIsOccupied);
+        controlPanel.setPreferredSize(new Dimension(400, 100));
+
+        mainContentPanel.add(categoryPanel, BorderLayout.CENTER);
+        mainContentPanel.add(controlPanel, BorderLayout.SOUTH);
+
+        flipPanel.add(mainContentPanel, "CategoryPanel");
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -84,7 +116,6 @@ public class MainPage extends JFrame {
 
             productsPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-            SelectDatabase selectDatabase = new SelectDatabase(connection);
             Vector<String> productNames = selectDatabase.getProductNames(categoryName);
 
             JPanel productButtonsPanel = new JPanel(new GridLayout(0, 5));

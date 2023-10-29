@@ -4,6 +4,14 @@ public class Table {
     private int id;
     private int nbSeats;
     private boolean isOccupied;
+    private String name;
+
+    public Table(int id, int nbSeats, boolean isOccupied) {
+        this.id = id;
+        this.nbSeats = nbSeats;
+        this.isOccupied = isOccupied;
+        this.name = "Masa " + this.id;
+    }
 
     public void occupyTable() {
         this.isOccupied = true;
@@ -11,5 +19,13 @@ public class Table {
 
     public void freeTable() {
         this.isOccupied = false;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
     }
 }
