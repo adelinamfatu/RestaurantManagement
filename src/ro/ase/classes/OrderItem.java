@@ -13,8 +13,16 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
     public float calculateSubtotal() {
         return product.getPrice() * quantity;
+    }
+
+    public void increaseQuantity() {
+        this.quantity++;
     }
 
     @Override

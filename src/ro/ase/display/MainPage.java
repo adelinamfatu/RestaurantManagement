@@ -63,28 +63,39 @@ public class MainPage extends JFrame {
         constraints.insets = new Insets(5, 5, 5, 5);
 
         cbTable = new JComboBox<>();
+        cbTable.addItem(MessageDisplayer.getInstance().getMessage("select_table_combobox"));
         cbTable.setFont(new Font("Arial", Font.PLAIN, 35));
         List<Table> tables = selectDatabase.getTables();
         for (Table table : tables) {
             cbTable.addItem(table.getName());
         }
+        cbTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (cbTable.getSelectedIndex() == 0) {
+                    cbTable.setSelectedItem(null);
+                }
+            }
+        });
 
         cbIsOccupied = new JCheckBox(MessageDisplayer.getInstance().getMessage("is_occupied_checkbox"));
         cbIsOccupied.setFont(new Font("Arial", Font.PLAIN, 35));
         cbTable.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedTableName = (String) cbTable.getSelectedItem();
-                boolean isOccupied = tables.stream()
-                        .filter(table -> table.getName().equals(selectedTableName))
-                        .findFirst().orElse(null).isOccupied();
-                cbIsOccupied.setSelected(isOccupied);
+                if(cbTable.getSelectedIndex() != 0) {
+                    String selectedTableName = (String) cbTable.getSelectedItem();
+                    boolean isOccupied = tables.stream()
+                            .filter(table -> table.getName().equals(selectedTableName))
+                            .findFirst().orElse(null).isOccupied();
+                    cbIsOccupied.setSelected(isOccupied);
 
-                int nbSeats = tables.stream()
-                        .filter(table -> table.getName().equals(selectedTableName))
-                        .findFirst().orElse(null).getNbSeats();
+                    int nbSeats = tables.stream()
+                            .filter(table -> table.getName().equals(selectedTableName))
+                            .findFirst().orElse(null).getNbSeats();
 
-                tfNbSeats.setText(String.valueOf(nbSeats));
+                    tfNbSeats.setText(String.valueOf(nbSeats));
+                }
             }
         });
 
@@ -177,7 +188,19 @@ public class MainPage extends JFrame {
 
                         if (result == JOptionPane.YES_OPTION) {
                             Product clickedProduct = (Product) productButton.getClientProperty("product");
-                            orderItemsModel.addElement(new OrderItem(clickedProduct, 1));
+                            boolean found = false;
+                            for (int i = 0; i < orderItemsModel.getSize(); i++) {
+                                OrderItem item = orderItemsModel.getElementAt(i);
+                                if (((item.getProduct()).compareTo(clickedProduct)) == 0) {
+                                    item.increaseQuantity();
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                orderItemsModel.addElement(new OrderItem(clickedProduct, 1));
+                            }
                         }
                     }
                 });
