@@ -1,8 +1,11 @@
 package ro.ase.display;
 import ro.ase.classes.*;
+import ro.ase.exceptions.InvalidAmountException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class NewProductPage extends JFrame {
     private JLabel nameLabel;
@@ -59,6 +62,37 @@ public class NewProductPage extends JFrame {
 
         addBtn = new JButton("Adauga produs");
         addBtn.setFont(font);
+        addBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String name = nameTF.getText();
+                    String description = descriptionTF.getText();
+                    float price = Float.parseFloat(priceTF.getText());
+                    int amount = Integer.parseInt(amountTF.getText());
+                    String selectedCategory = (String) categoryCB.getSelectedItem();
+
+                    if (name.isEmpty() || description.isEmpty() || price <= 0 || amount <= 0 || selectedCategory.isEmpty()) {
+                        throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("no_data_exception"));
+                    }
+                    if (name.matches(".*\\d+.*")) {
+                        throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("invalid_name_exception"));
+                    }
+                    if(amount < 100 || amount > 1000) {
+                        throw new InvalidAmountException();
+                    }
+
+                    Product newProduct = new Product(name, description, price, amount, Category.valueOf(selectedCategory));
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(NewProductPage.this, MessageDisplayer.getInstance().getMessage("price_amount_format_exception"));
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
+                } catch(InvalidAmountException ex) {
+                    JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
+                }
+            }
+        });
 
         categoryCB.setFont(font);
 
@@ -114,6 +148,5 @@ public class NewProductPage extends JFrame {
         panel.add(addBtn, constraints);
 
         add(panel);
-
     }
 }

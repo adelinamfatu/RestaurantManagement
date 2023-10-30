@@ -22,14 +22,14 @@ public class MainPage extends JFrame {
     private JCheckBox cbIsOccupied;
     private SelectDatabase selectDatabase;
     private JTextField tfNbSeats;
-    private JList<OrderItem> orderItems;
-    private DefaultListModel<OrderItem> orderItemsModel = new DefaultListModel<>();
+    private JList<OrderItem> orderDisplay;
+    private DefaultListModel<OrderItem> orderListModel = new DefaultListModel<>();
     private Map<Integer, Order> tableOrders = new HashMap<>();
 
     public MainPage(Connection connection) {
         this.connection = connection;
         this.selectDatabase = new SelectDatabase(connection);
-        this.orderItems = new JList<>();
+        this.orderDisplay = new JList<>();
 
         setTitle(MessageDisplayer.getInstance().getMessage("main_page_title"));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -117,13 +117,13 @@ public class MainPage extends JFrame {
                 if (cbIsOccupied.isSelected()) {
                     selectedTable.freeTable();
                     cbIsOccupied.setSelected(false);
-                    Integer key = selectedTable.getId();
+                    /*Integer key = selectedTable.getId();
                     Order value = new Order();
-                    for (int i = 0; i < orderItemsModel.getSize(); i++) {
-                        OrderItem orderItem = orderItemsModel.get(i);
+                    for (int i = 0; i < orderListModel.getSize(); i++) {
+                        OrderItem orderItem = orderListModel.get(i);
                         value.addOrderItem(orderItem);
                     }
-                    tableOrders.put(key, value);
+                    tableOrders.put(key, value);*/
                 } else {
                     selectedTable.occupyTable();
                     cbIsOccupied.setSelected(true);
@@ -176,9 +176,9 @@ public class MainPage extends JFrame {
         constraints.gridy = 3;
         controlPanel.add(submitOrder, constraints);
 
-        orderItems.setFont(new Font("Arial", Font.PLAIN, 35));
-        orderItems.setModel(orderItemsModel);
-        JScrollPane ordersPane = new JScrollPane(orderItems);
+        orderDisplay.setFont(new Font("Arial", Font.PLAIN, 35));
+        orderDisplay.setModel(orderListModel);
+        JScrollPane ordersPane = new JScrollPane(orderDisplay);
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridheight = 3;
@@ -251,8 +251,8 @@ public class MainPage extends JFrame {
                         if (result == JOptionPane.YES_OPTION) {
                             Product clickedProduct = (Product) productButton.getClientProperty("product");
                             boolean found = false;
-                            for (int i = 0; i < orderItemsModel.getSize(); i++) {
-                                OrderItem item = orderItemsModel.getElementAt(i);
+                            for (int i = 0; i < orderListModel.getSize(); i++) {
+                                OrderItem item = orderListModel.getElementAt(i);
                                 if (((item.getProduct()).compareTo(clickedProduct)) == 0) {
                                     item.increaseQuantity();
                                     found = true;
@@ -261,7 +261,7 @@ public class MainPage extends JFrame {
                             }
 
                             if (!found) {
-                                orderItemsModel.addElement(new OrderItem(clickedProduct, 1));
+                                orderListModel.addElement(new OrderItem(clickedProduct, 1));
                             }
                         }
                     }
