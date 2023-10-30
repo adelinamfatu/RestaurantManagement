@@ -13,10 +13,13 @@ public class Order {
     private Date date;
     private float totalPrice = 0;
 
-    public Order(int orderId) {
-        this.id = orderId;
+    public Order() {
         this.orderItems = new ArrayList<>();
         this.date = new Date();
+    }
+
+    public void addOrderItem(OrderItem item) {
+        this.orderItems.add(item);
     }
 
     public Date getDate() throws ParseException {

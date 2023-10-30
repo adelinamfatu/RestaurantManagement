@@ -8,7 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 public class MainPage extends JFrame {
@@ -23,6 +24,7 @@ public class MainPage extends JFrame {
     private JTextField tfNbSeats;
     private JList<OrderItem> orderItems;
     private DefaultListModel<OrderItem> orderItemsModel = new DefaultListModel<>();
+    private Map<Integer, Order> tableOrders = new HashMap<>();
 
     public MainPage(Connection connection) {
         this.connection = connection;
@@ -37,16 +39,29 @@ public class MainPage extends JFrame {
         cardLayout = new CardLayout();
         flipPanel = new JPanel(cardLayout);
 
+        JPanel titlePanel = new JPanel(new BorderLayout());
         titleLabel = new JLabel(MessageDisplayer.getInstance().getMessage("main_page_title"));
         titleLabel.setFont(new Font("Arial", Font.BOLD, 50));
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+
+        JButton addButton = new JButton(MessageDisplayer.getInstance().getMessage("open_new_product_page"));
+        addButton.setFont(new Font("Arial", Font.BOLD, 30));
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NewProductPage newProductPage = new NewProductPage();
+                newProductPage.setVisible(true);
+            }
+        });
+        titlePanel.add(addButton, BorderLayout.EAST);
 
         Border spaceBeforeTitle = BorderFactory.createEmptyBorder(20, 0, 10, 0);
         Border spaceAfterTitle = BorderFactory.createEmptyBorder(10, 0, 20, 0);
         titleLabel.setBorder(BorderFactory.createCompoundBorder(spaceBeforeTitle, spaceAfterTitle));
 
         JPanel mainContentPanel = new JPanel(new BorderLayout());
-        mainContentPanel.add(titleLabel, BorderLayout.NORTH);
+        mainContentPanel.add(titlePanel, BorderLayout.NORTH);
 
         categoryPanel = new JPanel(new GridLayout(0, 5));
         Font buttonFont = new Font("Arial", Font.PLAIN, 50);
@@ -78,6 +93,33 @@ public class MainPage extends JFrame {
             }
         });
 
+        JButton submitOrder = new JButton(MessageDisplayer.getInstance().getMessage("submit_order_unoccupied"));
+        submitOrder.setFont(new Font("Arial", Font.PLAIN, 35));
+        submitOrder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedTableName = (String) cbTable.getSelectedItem();
+                Table selectedTable = tables.stream()
+                        .filter(table -> table.getName().equals(selectedTableName))
+                        .findFirst().orElse(null);
+
+                if (cbIsOccupied.isSelected()) {
+                    selectedTable.freeTable();
+                    cbIsOccupied.setSelected(false);
+                    Integer key = selectedTable.getId();
+                    Order value = new Order();
+                    for (int i = 0; i < orderItemsModel.getSize(); i++) {
+                        OrderItem orderItem = orderItemsModel.get(i);
+                        value.addOrderItem(orderItem);
+                    }
+                    tableOrders.put(key, value);
+                } else {
+                    selectedTable.occupyTable();
+                    cbIsOccupied.setSelected(true);
+                }
+            }
+        });
+
         cbIsOccupied = new JCheckBox(MessageDisplayer.getInstance().getMessage("is_occupied_checkbox"));
         cbIsOccupied.setFont(new Font("Arial", Font.PLAIN, 35));
         cbTable.addActionListener(new ActionListener() {
@@ -93,8 +135,14 @@ public class MainPage extends JFrame {
                     int nbSeats = tables.stream()
                             .filter(table -> table.getName().equals(selectedTableName))
                             .findFirst().orElse(null).getNbSeats();
-
                     tfNbSeats.setText(String.valueOf(nbSeats));
+
+                    if(isOccupied) {
+                        submitOrder.setText(MessageDisplayer.getInstance().getMessage("submit_order_occupied"));
+                    }
+                    else {
+                        submitOrder.setText(MessageDisplayer.getInstance().getMessage("submit_order_unoccupied"));
+                    }
                 }
             }
         });
@@ -113,6 +161,9 @@ public class MainPage extends JFrame {
 
         constraints.gridy = 2;
         controlPanel.add(tfNbSeats, constraints);
+
+        constraints.gridy = 3;
+        controlPanel.add(submitOrder, constraints);
 
         orderItems.setFont(new Font("Arial", Font.PLAIN, 35));
         orderItems.setModel(orderItemsModel);

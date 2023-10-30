@@ -6,7 +6,6 @@ public class Product implements Comparable<Product> {
     private String description;
     private float price;
     private int amount;
-    //private Category type;
 
     public Product(int id, String name, String description, float price, int amount) {
         this.id = id;
@@ -14,6 +13,14 @@ public class Product implements Comparable<Product> {
         this.description = description;
         this.price = price;
         this.amount = amount;
+    }
+
+    public Product(Product otherProduct) {
+        this.id = otherProduct.id;
+        this.name = otherProduct.name;
+        this.description = otherProduct.description;
+        this.price = otherProduct.price;
+        this.amount = otherProduct.amount;
     }
 
     public float getPrice() {

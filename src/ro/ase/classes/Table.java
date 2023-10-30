@@ -29,6 +29,10 @@ public class Table {
         return isOccupied;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public int getNbSeats() {
         return nbSeats;
     }
