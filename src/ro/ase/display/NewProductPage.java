@@ -18,7 +18,7 @@ public class NewProductPage extends JFrame {
     private JButton addBtn;
 
     public NewProductPage() {
-        setTitle(MessageDisplayer.getInstance().getMessage("new_page_title"));
+        setTitle(MessageDisplayer.getInstance().getMessage("new_product_title"));
         setResizable(false);
         setSize(600, 900);
 

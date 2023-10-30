@@ -56,6 +56,17 @@ public class MainPage extends JFrame {
         });
         titlePanel.add(addButton, BorderLayout.EAST);
 
+        JButton statisticsButton = new JButton(MessageDisplayer.getInstance().getMessage("open_statistics_page"));
+        statisticsButton.setFont(new Font("Arial", Font.BOLD, 30));
+        statisticsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StatisticsPage statisticsPage = new StatisticsPage();
+                statisticsPage.setVisible(true);
+            }
+        });
+        titlePanel.add(statisticsButton, BorderLayout.WEST);
+
         Border spaceBeforeTitle = BorderFactory.createEmptyBorder(20, 0, 10, 0);
         Border spaceAfterTitle = BorderFactory.createEmptyBorder(10, 0, 20, 0);
         titleLabel.setBorder(BorderFactory.createCompoundBorder(spaceBeforeTitle, spaceAfterTitle));
