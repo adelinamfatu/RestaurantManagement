@@ -13,16 +13,21 @@ public class Order {
     private Date date;
     private float totalPrice = 0;
 
-    public Order() {
+    public Order(Table table) {
+        this.table = table;
         this.orderItems = new ArrayList<>();
         this.date = new Date();
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     public void addOrderItem(OrderItem item) {
         this.orderItems.add(item);
     }
 
-    public Date getDate() throws ParseException {
+    public Date getFormattedDate() throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         String formattedDate = dateFormat.format(this.date);
         return dateFormat.parse(formattedDate);
@@ -46,5 +51,9 @@ public class Order {
             totalPrice += item.calculateSubtotal();
         }
         return totalPrice;
+    }
+
+    public int getTableId() {
+        return this.table.getId();
     }
 }

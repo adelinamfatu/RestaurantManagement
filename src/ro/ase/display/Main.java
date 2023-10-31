@@ -64,7 +64,10 @@ public class Main {
                 mainPage.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        updateDatabase.addProducts(mainPage.products);
+                        if(mainPage.products != null) {
+                            updateDatabase.addProducts(mainPage.products);
+                        }
+                        updateDatabase.updateTables(mainPage.tables);
                         System.out.println("Closing database connection");
                         dbConnection.closeConnection();
                     }

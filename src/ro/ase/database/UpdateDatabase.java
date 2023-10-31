@@ -1,10 +1,12 @@
 package ro.ase.database;
 
 import ro.ase.classes.Product;
+import ro.ase.classes.Table;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 
 public class UpdateDatabase {
@@ -27,6 +29,20 @@ public class UpdateDatabase {
                     preparedStatement.setString(5, product.getCategory().toString());
                     preparedStatement.executeUpdate();
                 }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateTables(List<Table> tables) {
+        String updateQuery = "UPDATE tables SET isOccupied = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+            for (Table table : tables) {
+                preparedStatement.setBoolean(1, table.isOccupied());
+                preparedStatement.setInt(2, table.getId());
+                preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             e.printStackTrace();

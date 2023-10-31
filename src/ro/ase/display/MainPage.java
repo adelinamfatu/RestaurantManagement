@@ -10,10 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MainPage extends JFrame {
     private JLabel titleLabel;
@@ -21,15 +20,16 @@ public class MainPage extends JFrame {
     private CardLayout cardLayout;
     private JPanel categoryPanel;
     private Connection connection;
-    private JComboBox<String> cbTable;
-    private JCheckBox cbIsOccupied;
+    private JComboBox<String> tableCombobox;
+    private JCheckBox isOccupiedCheckbox;
     private SelectDatabase selectDatabase;
-    private JTextField tfNbSeats;
+    private JTextField nbSeatsTf;
     private JList<OrderItem> orderDisplay;
     private DefaultListModel<OrderItem> orderListModel = new DefaultListModel<>();
-    private Map<Integer, Order> tableOrders = new HashMap<>();
     private List<Product> productDetails;
     public Set<Product> products;
+    public List<Table> tables;
+    public List<Order> orders = new ArrayList<>();
 
     public MainPage(Connection connection) {
         this.connection = connection;
@@ -99,98 +99,132 @@ public class MainPage extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 5, 5);
 
-        cbTable = new JComboBox<>();
-        cbTable.addItem(MessageDisplayer.getInstance().getMessage("select_table_combobox"));
-        cbTable.setFont(new Font("Arial", Font.PLAIN, 35));
-        List<Table> tables = selectDatabase.getTables();
-        for (Table table : tables) {
-            cbTable.addItem(table.getName());
-        }
-        cbTable.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (cbTable.getSelectedIndex() == 0) {
-                    cbTable.setSelectedItem(null);
-                }
-            }
-        });
+        JLabel tableLabel = new JLabel(MessageDisplayer.getInstance().getMessage("select_table_label"));
+        tableLabel.setFont(new Font("Arial", Font.PLAIN, 40));
 
-        JButton submitOrder = new JButton(MessageDisplayer.getInstance().getMessage("submit_order_unoccupied"));
+        JLabel isOccupiedLabel = new JLabel(MessageDisplayer.getInstance().getMessage("occupied_table_label"));
+        isOccupiedLabel.setFont(new Font("Arial", Font.PLAIN, 40));
+
+        JLabel nbSeatsLabel = new JLabel(MessageDisplayer.getInstance().getMessage("nb_seats_label"));
+        nbSeatsLabel.setFont(new Font("Arial", Font.PLAIN, 40));
+
+        tableCombobox = new JComboBox<>();
+        tableCombobox.setFont(new Font("Arial", Font.PLAIN, 35));
+        tables = selectDatabase.getTables();
+        for (Table table : tables) {
+            tableCombobox.addItem(table.getName());
+        }
+
+        JButton submitOrder = new JButton(MessageDisplayer.getInstance().getMessage("submit_order"));
         submitOrder.setFont(new Font("Arial", Font.PLAIN, 35));
         submitOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedTableName = (String) cbTable.getSelectedItem();
+                String selectedTableName = (String) tableCombobox.getSelectedItem();
                 Table selectedTable = tables.stream()
                         .filter(table -> table.getName().equals(selectedTableName))
                         .findFirst().orElse(null);
 
-                if (cbIsOccupied.isSelected()) {
-                    selectedTable.freeTable();
-                    cbIsOccupied.setSelected(false);
-                    /*Integer key = selectedTable.getId();
-                    Order value = new Order();
-                    for (int i = 0; i < orderListModel.getSize(); i++) {
-                        OrderItem orderItem = orderListModel.get(i);
-                        value.addOrderItem(orderItem);
+                if (isOccupiedCheckbox.isSelected()) {
+                    Font messageFont = new Font("Arial", Font.PLAIN, 35);
+                    UIManager.put("OptionPane.messageFont", messageFont);
+                    UIManager.put("Button.font", messageFont);
+                    UIManager.put("OptionPane.minimumSize", new Dimension(300,200));
+
+                    int choice = JOptionPane.showConfirmDialog(MainPage.this,
+                            MessageDisplayer.getInstance().getMessage("submit_message"),
+                            MessageDisplayer.getInstance().getMessage("submit_title"),
+                            JOptionPane.YES_NO_OPTION);
+                    if(choice == JOptionPane.YES_OPTION) {
+                        selectedTable.freeTable();
+                        isOccupiedCheckbox.setSelected(false);
                     }
-                    tableOrders.put(key, value);*/
                 } else {
+                    Order newOrder = new Order(selectedTable);
+                    orders.add(newOrder);
                     selectedTable.occupyTable();
-                    cbIsOccupied.setSelected(true);
+                    isOccupiedCheckbox.setSelected(true);
+                }
+
+                Optional<Order> order = orders.stream().
+                        filter(o -> o.getTableId() == selectedTable.getId()).
+                        max(Comparator.comparing(Order::getDate));
+
+                if (order.isPresent()) {
+                    Order tableOrder = order.get();
+                    for (int i = 0; i < orderListModel.getSize(); i++) {
+                        OrderItem item = orderListModel.getElementAt(i);
+                        tableOrder.addOrderItem(item);
+                    }
                 }
             }
         });
 
-        cbIsOccupied = new JCheckBox(MessageDisplayer.getInstance().getMessage("is_occupied_checkbox"));
-        cbIsOccupied.setFont(new Font("Arial", Font.PLAIN, 35));
-        cbTable.addActionListener(new ActionListener() {
+        isOccupiedCheckbox = new JCheckBox();
+        isOccupiedCheckbox.setFocusable(false);
+        ImageIcon yesIcon = new ImageIcon(getClass().getResource("/ro/ase/images/yes.png"));
+        ImageIcon noIcon = new ImageIcon(getClass().getResource("/ro/ase/images/no.png"));
+        isOccupiedCheckbox.setSelectedIcon(yesIcon);
+        isOccupiedCheckbox.setIcon(noIcon);
+        isOccupiedCheckbox.setEnabled(false);
+
+        tableCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(cbTable.getSelectedIndex() != 0) {
-                    String selectedTableName = (String) cbTable.getSelectedItem();
+                if(tableCombobox.getSelectedIndex() != 0) {
+                    String selectedTableName = (String) tableCombobox.getSelectedItem();
                     boolean isOccupied = tables.stream()
                             .filter(table -> table.getName().equals(selectedTableName))
                             .findFirst().orElse(null).isOccupied();
-                    cbIsOccupied.setSelected(isOccupied);
+                    isOccupiedCheckbox.setSelected(isOccupied);
 
                     int nbSeats = tables.stream()
                             .filter(table -> table.getName().equals(selectedTableName))
                             .findFirst().orElse(null).getNbSeats();
-                    tfNbSeats.setText(String.valueOf(nbSeats));
-
-                    if(isOccupied) {
-                        submitOrder.setText(MessageDisplayer.getInstance().getMessage("submit_order_occupied"));
-                    }
-                    else {
-                        submitOrder.setText(MessageDisplayer.getInstance().getMessage("submit_order_unoccupied"));
-                    }
+                    nbSeatsTf.setText(String.valueOf(nbSeats));
                 }
             }
         });
 
-        tfNbSeats = new JTextField(5);
-        tfNbSeats.setFont(new Font("Arial", Font.PLAIN, 35));
-        tfNbSeats.setEditable(false);
+        nbSeatsTf = new JTextField(5);
+        nbSeatsTf.setFont(new Font("Arial", Font.PLAIN, 35));
+        nbSeatsTf.setEditable(false);
 
-        constraints.gridx = 0;
+        int gridxForLabels = 0;
+        int gridxForControls = 1;
+
+        constraints.gridx = gridxForLabels;
         constraints.gridy = 0;
-        constraints.anchor = GridBagConstraints.WEST;
-        controlPanel.add(cbTable, constraints);
+        controlPanel.add(tableLabel, constraints);
+
+        constraints.gridx = gridxForControls;
+        controlPanel.add(tableCombobox, constraints);
 
         constraints.gridy = 1;
-        controlPanel.add(cbIsOccupied, constraints);
+
+        constraints.gridx = gridxForLabels;
+        controlPanel.add(isOccupiedLabel, constraints);
+
+        constraints.gridx = gridxForControls;
+        controlPanel.add(isOccupiedCheckbox, constraints);
 
         constraints.gridy = 2;
-        controlPanel.add(tfNbSeats, constraints);
+
+        constraints.gridx = gridxForLabels;
+        controlPanel.add(nbSeatsLabel, constraints);
+
+        constraints.gridx = gridxForControls;
+        controlPanel.add(nbSeatsTf, constraints);
 
         constraints.gridy = 3;
+        constraints.gridx = gridxForControls;
+        constraints.gridheight = 3;
         controlPanel.add(submitOrder, constraints);
 
         orderDisplay.setFont(new Font("Arial", Font.PLAIN, 35));
         orderDisplay.setModel(orderListModel);
         JScrollPane ordersPane = new JScrollPane(orderDisplay);
-        constraints.gridx = 1;
+        constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridheight = 3;
         constraints.fill = GridBagConstraints.BOTH;
