@@ -7,9 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 public class SelectDatabase {
     private Connection connection;
@@ -18,7 +16,7 @@ public class SelectDatabase {
         this.connection = connection;
     }
 
-    public List<Product> getProductDetails(String categoryName) {
+    public List<Product> getProductDetailsByCategory(String categoryName) {
         List<Product> productDetails = new ArrayList<>();
 
         try {
@@ -69,5 +67,24 @@ public class SelectDatabase {
         }
 
         return tables;
+    }
+
+    public Set<Product> getAllProductNamesAndIds() {
+        Set<Product> productNamesAndIds = new HashSet<>();
+        String selectQuery = "SELECT id, name FROM products";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("id");
+                String productName = resultSet.getString("name");
+                productNamesAndIds.add(new Product(productId, productName));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productNamesAndIds;
     }
 }

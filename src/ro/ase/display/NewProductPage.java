@@ -1,11 +1,18 @@
 package ro.ase.display;
 import ro.ase.classes.*;
+import ro.ase.database.SelectDatabase;
+import ro.ase.exceptions.DuplicateProductException;
 import ro.ase.exceptions.InvalidAmountException;
+import ro.ase.exceptions.NegativeValueException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class NewProductPage extends JFrame {
     private JLabel nameLabel;
@@ -19,8 +26,15 @@ public class NewProductPage extends JFrame {
     private JLabel categoryLabel;
     private JComboBox categoryCB;
     private JButton addBtn;
+    private Set<Product> products = new HashSet<>();
+    private Connection connection;
+    private SelectDatabase selectDatabase;
 
-    public NewProductPage() {
+    public NewProductPage(Connection connection) {
+        this.connection = connection;
+        this.selectDatabase = new SelectDatabase(connection);
+        products = selectDatabase.getAllProductNamesAndIds();
+
         setTitle(MessageDisplayer.getInstance().getMessage("new_product_title"));
         setResizable(false);
         setSize(600, 900);
@@ -72,8 +86,11 @@ public class NewProductPage extends JFrame {
                     int amount = Integer.parseInt(amountTF.getText());
                     String selectedCategory = (String) categoryCB.getSelectedItem();
 
-                    if (name.isEmpty() || description.isEmpty() || price <= 0 || amount <= 0 || selectedCategory.isEmpty()) {
+                    if (name.isEmpty() || description.isEmpty() || priceTF.getText().isEmpty() || amountTF.getText().isEmpty() || selectedCategory.isEmpty()) {
                         throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("no_data_exception"));
+                    }
+                    if(price <= 0 || amount <= 0) {
+                        throw new NegativeValueException();
                     }
                     if (name.matches(".*\\d+.*")) {
                         throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("invalid_name_exception"));
@@ -83,12 +100,21 @@ public class NewProductPage extends JFrame {
                     }
 
                     Product newProduct = new Product(name, description, price, amount, Category.valueOf(selectedCategory));
+                    if (products.contains(newProduct)) {
+                        throw new DuplicateProductException();
+                    } else {
+                        products.add(newProduct);
+                    }
 
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(NewProductPage.this, MessageDisplayer.getInstance().getMessage("price_amount_format_exception"));
                 } catch (IllegalArgumentException ex) {
                     JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
                 } catch(InvalidAmountException ex) {
+                    JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
+                } catch(NegativeValueException ex) {
+                    JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
+                } catch (DuplicateProductException ex) {
                     JOptionPane.showMessageDialog(NewProductPage.this, ex.getMessage());
                 }
             }

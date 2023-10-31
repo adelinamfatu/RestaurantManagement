@@ -4,6 +4,6 @@ import ro.ase.display.MessageDisplayer;
 
 public class DuplicateProductException extends Exception {
     public DuplicateProductException() {
-        super(MessageDisplayer.getInstance().getMessage(""));
+        super(MessageDisplayer.getInstance().getMessage("duplicate_product_exception"));
     }
 }

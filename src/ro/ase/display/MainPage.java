@@ -25,6 +25,7 @@ public class MainPage extends JFrame {
     private JList<OrderItem> orderDisplay;
     private DefaultListModel<OrderItem> orderListModel = new DefaultListModel<>();
     private Map<Integer, Order> tableOrders = new HashMap<>();
+    List<Product> productDetails;
 
     public MainPage(Connection connection) {
         this.connection = connection;
@@ -50,7 +51,7 @@ public class MainPage extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NewProductPage newProductPage = new NewProductPage();
+                NewProductPage newProductPage = new NewProductPage(connection);
                 newProductPage.setVisible(true);
             }
         });
@@ -222,7 +223,7 @@ public class MainPage extends JFrame {
 
             productsPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-            List<Product> productDetails = selectDatabase.getProductDetails(categoryName);
+            productDetails = selectDatabase.getProductDetailsByCategory(categoryName);
 
             JPanel productButtonsPanel = new JPanel(new GridLayout(0, 5));
 
