@@ -15,16 +15,18 @@ public class UpdateDatabase {
     }
 
     public void addProducts(Set<Product> products) {
-        String insertQuery = "INSERT INTO products (name, description, price, amount, category) VALUES (?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO products (name, description, price, amount, type) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
             for (Product product : products) {
-                preparedStatement.setString(1, product.getName());
-                preparedStatement.setString(2, product.getDescription());
-                preparedStatement.setFloat(3, product.getPrice());
-                preparedStatement.setInt(4, product.getAmount());
-                preparedStatement.setString(5, product.getCategory().toString());
-                preparedStatement.executeUpdate();
+                if(product.getId() == 0) {
+                    preparedStatement.setString(1, product.getName());
+                    preparedStatement.setString(2, product.getDescription());
+                    preparedStatement.setFloat(3, product.getPrice());
+                    preparedStatement.setInt(4, product.getAmount());
+                    preparedStatement.setString(5, product.getCategory().toString());
+                    preparedStatement.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

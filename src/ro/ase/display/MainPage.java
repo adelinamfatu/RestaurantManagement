@@ -7,10 +7,13 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
 
 public class MainPage extends JFrame {
     private JLabel titleLabel;
@@ -25,7 +28,8 @@ public class MainPage extends JFrame {
     private JList<OrderItem> orderDisplay;
     private DefaultListModel<OrderItem> orderListModel = new DefaultListModel<>();
     private Map<Integer, Order> tableOrders = new HashMap<>();
-    List<Product> productDetails;
+    private List<Product> productDetails;
+    public Set<Product> products;
 
     public MainPage(Connection connection) {
         this.connection = connection;
@@ -35,7 +39,7 @@ public class MainPage extends JFrame {
         setTitle(MessageDisplayer.getInstance().getMessage("main_page_title"));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         cardLayout = new CardLayout();
         flipPanel = new JPanel(cardLayout);
@@ -53,6 +57,12 @@ public class MainPage extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 NewProductPage newProductPage = new NewProductPage(connection);
                 newProductPage.setVisible(true);
+                newProductPage.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        products = newProductPage.getProducts();
+                    }
+                });
             }
         });
         titlePanel.add(addButton, BorderLayout.EAST);

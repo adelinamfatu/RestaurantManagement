@@ -25,6 +25,7 @@ public class Product implements Comparable<Product> {
     }
 
     public Product(String name, String description, float price, int amount, Category category) {
+        this.id = 0;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -58,6 +59,10 @@ public class Product implements Comparable<Product> {
 
     public Category getCategory() {
         return category;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override

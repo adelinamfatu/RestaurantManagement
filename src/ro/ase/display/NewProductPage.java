@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -95,7 +94,7 @@ public class NewProductPage extends JFrame {
                     if (name.matches(".*\\d+.*")) {
                         throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("invalid_name_exception"));
                     }
-                    if(amount < 100 || amount > 1000) {
+                    if(amount < 50 || amount > 1000) {
                         throw new InvalidAmountException();
                     }
 
@@ -104,6 +103,8 @@ public class NewProductPage extends JFrame {
                         throw new DuplicateProductException();
                     } else {
                         products.add(newProduct);
+                        JOptionPane.showMessageDialog(NewProductPage.this, MessageDisplayer.getInstance().getMessage("add_product_succes"));
+                        clearInputFields();
                     }
 
                 } catch (NumberFormatException ex) {
@@ -174,5 +175,17 @@ public class NewProductPage extends JFrame {
         panel.add(addBtn, constraints);
 
         add(panel);
+    }
+
+    private void clearInputFields() {
+        nameTF.setText("");
+        descriptionTF.setText("");
+        priceTF.setText("");
+        amountTF.setText("");
+        categoryCB.setSelectedIndex(0);
+    }
+
+    public Set<Product> getProducts() {
+        return products;
     }
 }

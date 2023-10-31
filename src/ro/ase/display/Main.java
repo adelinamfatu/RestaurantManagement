@@ -1,16 +1,21 @@
 package ro.ase.display;
+import ro.ase.classes.Product;
 import ro.ase.database.DatabaseConnection;
+import ro.ase.database.UpdateDatabase;
+
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws ClassNotFoundException {
         DatabaseConnection dbConnection = new DatabaseConnection("src/ro/ase/database/restaurant.sqlite");
         Connection connection = dbConnection.getConnection();
+        UpdateDatabase updateDatabase = new UpdateDatabase(connection);
 
         try {
             Statement statement = connection.createStatement();
@@ -55,15 +60,15 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 MainPage mainPage = new MainPage(connection);
-
+                mainPage.setVisible(true);
                 mainPage.addWindowListener(new WindowAdapter() {
                     @Override
-                    public void windowClosed(WindowEvent e) {
+                    public void windowClosing(WindowEvent e) {
+                        updateDatabase.addProducts(mainPage.products);
+                        System.out.println("Closing database connection");
                         dbConnection.closeConnection();
                     }
                 });
-
-                mainPage.setVisible(true);
             }
         });
     }
