@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Order {
-    private int id;
     private List<OrderItem> orderItems;
     private Table table;
     private Date date;
@@ -46,7 +45,7 @@ public class Order {
         return orderItems;
     }
 
-    public double calculateTotalPrice() {
+    public double getTotalPrice() {
         for (OrderItem item : orderItems) {
             totalPrice += item.calculateSubtotal();
         }

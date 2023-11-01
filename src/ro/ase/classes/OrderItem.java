@@ -17,6 +17,10 @@ public class OrderItem {
         return product;
     }
 
+    public int getProductId() {
+        return product.getId();
+    }
+
     public int getQuantity() {
         return quantity;
     }

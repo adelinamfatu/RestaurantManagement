@@ -1,11 +1,11 @@
 package ro.ase.database;
 
+import ro.ase.classes.Order;
+import ro.ase.classes.OrderItem;
 import ro.ase.classes.Product;
 import ro.ase.classes.Table;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +43,48 @@ public class UpdateDatabase {
                 preparedStatement.setBoolean(1, table.isOccupied());
                 preparedStatement.setInt(2, table.getId());
                 preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addOrders(List<Order> orders) {
+        String insertOrderQuery = "INSERT INTO Orders (tableId, totalPrice, orderDate) VALUES (?, ?, ?)";
+        String insertOrderItemQuery = "INSERT INTO OrderItems (productId, quantity, orderId) VALUES (?, ?, ?)";
+
+        try {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement insertOrderStatement = connection.prepareStatement(insertOrderQuery, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement insertOrderItemStatement = connection.prepareStatement(insertOrderItemQuery)) {
+
+                for (Order order : orders) {
+                    insertOrderStatement.setInt(1, order.getTableId());
+                    insertOrderStatement.setDouble(2, order.getTotalPrice());
+                    insertOrderStatement.setTimestamp(3, new java.sql.Timestamp(order.getDate().getTime()));
+                    insertOrderStatement.executeUpdate();
+
+                    try (ResultSet generatedKeys = insertOrderStatement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int orderId = generatedKeys.getInt(1);
+
+                            for (OrderItem orderItem : order.getOrderItems()) {
+                                insertOrderItemStatement.setInt(1, orderItem.getProductId());
+                                insertOrderItemStatement.setInt(2, orderItem.getQuantity());
+                                insertOrderItemStatement.setInt(3, orderId);
+                                insertOrderItemStatement.executeUpdate();
+                            }
+                        }
+                    }
+                }
+
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                e.printStackTrace();
+            } finally {
+                connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             e.printStackTrace();

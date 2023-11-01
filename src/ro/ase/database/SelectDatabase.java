@@ -87,4 +87,91 @@ public class SelectDatabase {
 
         return productNamesAndIds;
     }
+
+    public int getWeekOrdersCount() {
+        int ordersCount = 0;
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            Date weekStartDate = calendar.getTime();
+
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            Date weekEndDate = calendar.getTime();
+
+            String sql = "SELECT COUNT(*) FROM orders WHERE orderDate >= ? AND orderDate <= ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDate(1, new java.sql.Date(weekStartDate.getTime()));
+            preparedStatement.setDate(2, new java.sql.Date(weekEndDate.getTime()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                ordersCount = resultSet.getInt(1);
+            }
+
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ordersCount;
+    }
+
+    public String getMostSoldProduct() {
+        String mostSoldProduct = null;
+        try {
+            String sql = "SELECT p.name, SUM(oi.quantity) AS total_quantity " +
+                    "FROM Products p " +
+                    "INNER JOIN OrderItems oi ON p.id = oi.productId " +
+                    "GROUP BY p.name " +
+                    "ORDER BY total_quantity DESC " +
+                    "LIMIT 1";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                mostSoldProduct = resultSet.getString("name");
+            }
+
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return mostSoldProduct;
+    }
+
+    public double getWeekRevenue() {
+        double revenue = 0.0;
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            Date weekStartDate = calendar.getTime();
+
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            Date weekEndDate = calendar.getTime();
+
+            String sql = "SELECT SUM(oi.quantity * p.price) AS total_revenue " +
+                    "FROM OrderItems oi " +
+                    "INNER JOIN Products p ON oi.productId = p.id " +
+                    "INNER JOIN Orders o ON oi.orderId = o.id " +
+                    "WHERE o.orderDate >= ? AND o.orderDate <= ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDate(1, new java.sql.Date(weekStartDate.getTime()));
+            preparedStatement.setDate(2, new java.sql.Date(weekEndDate.getTime()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                revenue = resultSet.getDouble("total_revenue");
+            }
+
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return revenue;
+    }
 }

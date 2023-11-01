@@ -72,7 +72,7 @@ public class MainPage extends JFrame {
         statisticsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StatisticsPage statisticsPage = new StatisticsPage();
+                StatisticsPage statisticsPage = new StatisticsPage(connection);
                 statisticsPage.setVisible(true);
             }
         });
@@ -154,7 +154,19 @@ public class MainPage extends JFrame {
                     Order tableOrder = order.get();
                     for (int i = 0; i < orderListModel.getSize(); i++) {
                         OrderItem item = orderListModel.getElementAt(i);
-                        tableOrder.addOrderItem(item);
+
+                        Optional<OrderItem> existingItemOptional = tableOrder.getOrderItems()
+                                .stream()
+                                .filter(orderItem -> orderItem.getProduct().equals(item.getProduct()))
+                                .findFirst();
+
+                        if (existingItemOptional.isPresent()) {
+                            OrderItem existingItem = existingItemOptional.get();
+                            existingItem.increaseQuantity();
+                        }
+                        else {
+                            tableOrder.addOrderItem(item);
+                        }
                     }
                 }
             }

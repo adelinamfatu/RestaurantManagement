@@ -1,5 +1,4 @@
 package ro.ase.display;
-import ro.ase.classes.Product;
 import ro.ase.database.DatabaseConnection;
 import ro.ase.database.UpdateDatabase;
 
@@ -9,7 +8,6 @@ import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws ClassNotFoundException {
@@ -45,7 +43,8 @@ public class Main {
             String createOrderItemTableSQL = "CREATE TABLE IF NOT EXISTS OrderItems (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "productId INTEGER NOT NULL, " +
-                    "quantity INTEGER NOT NULL" +
+                    "quantity INTEGER NOT NULL," +
+                    "orderId INTEGER NOT NULL" +
                     ");";
 
             statement.executeUpdate(createProductTableSQL);
@@ -66,6 +65,9 @@ public class Main {
                     public void windowClosing(WindowEvent e) {
                         if(mainPage.products != null) {
                             updateDatabase.addProducts(mainPage.products);
+                        }
+                        if(mainPage.orders != null) {
+                            updateDatabase.addOrders(mainPage.orders);
                         }
                         updateDatabase.updateTables(mainPage.tables);
                         System.out.println("Closing database connection");
