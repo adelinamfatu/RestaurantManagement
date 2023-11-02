@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
 
+/**
+ * clasa derivata din JFrame care reprezinta interfata pentru statistici
+ * */
 public class StatisticsPage extends JFrame {
     private JLabel totalWeekOrdersLabel;
     private JLabel mostOrderedProductLabel;
@@ -20,25 +23,22 @@ public class StatisticsPage extends JFrame {
         setSize(1200, 1200);
         setLayout(new BorderLayout());
 
-        JPanel labelsPanel = new JPanel(new BorderLayout());
+        JPanel labelsPanel = new JPanel(new GridLayout(1, 3));
 
         int ordersCount = selectDatabase.getWeekOrdersCount();
         totalWeekOrdersLabel = new JLabel("<html><div style='text-align: center;'><b>" + ordersCount + "</b><br>comenzi saptamana asta</div></html>");
-        totalWeekOrdersLabel.setFont(new Font("Arial", Font.PLAIN, 35));
-        //totalWeekOrdersLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        labelsPanel.add(totalWeekOrdersLabel, BorderLayout.WEST);
+        totalWeekOrdersLabel.setFont(new Font("Arial", Font.PLAIN, 30));
+        labelsPanel.add(totalWeekOrdersLabel);
 
         double weekRevenue = selectDatabase.getWeekRevenue();
         totalWeekRevenueLabel = new JLabel("<html><div style='text-align: center;'><b>" + weekRevenue + "</b><br>incasari saptamana asta</div></html>");
-        totalWeekRevenueLabel.setFont(new Font("Arial", Font.PLAIN, 35));
-        //totalWeekRevenueLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        labelsPanel.add(totalWeekRevenueLabel, BorderLayout.CENTER);
+        totalWeekRevenueLabel.setFont(new Font("Arial", Font.PLAIN, 30));
+        labelsPanel.add(totalWeekRevenueLabel);
 
         String mostOrderedProduct = selectDatabase.getMostSoldProduct();
         mostOrderedProductLabel = new JLabel("<html><div style='text-align: center;'><b>" + mostOrderedProduct + "</b><br>cel mai vandut produs</div></html>");
-        mostOrderedProductLabel.setFont(new Font("Arial", Font.PLAIN, 35));
-        //mostOrderedProductLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        labelsPanel.add(mostOrderedProductLabel, BorderLayout.EAST);
+        mostOrderedProductLabel.setFont(new Font("Arial", Font.PLAIN, 30));
+        labelsPanel.add(mostOrderedProductLabel);
 
         add(labelsPanel, BorderLayout.CENTER);
     }

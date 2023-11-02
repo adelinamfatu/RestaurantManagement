@@ -3,9 +3,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * clasa ce se ocupa cu conexiunea cu baza de date
+ * */
 public class DatabaseConnection {
     private Connection connection;
 
+    /**
+     * metoda care face conexiunea cu baza de date sqlite
+     * @param databasePath - calea catre baza de date
+     * */
     public DatabaseConnection(String databasePath) throws ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
         try {

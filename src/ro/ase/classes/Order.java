@@ -6,12 +6,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * clasa Comanda
+ * */
 public class Order {
     private List<OrderItem> orderItems;
     private Table table;
     private Date date;
     private float totalPrice = 0;
 
+    /**
+     * constructorul clasei Comanda
+     * este pusa automat data curenta
+     * */
     public Order(Table table) {
         this.table = table;
         this.orderItems = new ArrayList<>();

@@ -4,6 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * clasa care reprezinta un element al unei comenzi
+ * */
 public class OrderItem {
     private Product product;
     private int quantity;

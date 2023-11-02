@@ -1,5 +1,8 @@
 package ro.ase.classes;
 
+/**
+ * enum de categorii de produse
+ * */
 public enum Category {
     ROLLS(1),
     NIGIRI(2),

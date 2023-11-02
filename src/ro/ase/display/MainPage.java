@@ -14,6 +14,9 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * clasa derivata din JFrame care reprezinta interfata principala
+ * */
 public class MainPage extends JFrame {
     private JLabel titleLabel;
     private JPanel flipPanel;
@@ -52,6 +55,10 @@ public class MainPage extends JFrame {
 
         JButton addButton = new JButton(MessageDisplayer.getInstance().getMessage("open_new_product_page"));
         addButton.setFont(new Font("Arial", Font.BOLD, 30));
+        /**
+         * deschiderea paginii de adaugare a unui nou produs la apasarea pe buton
+         * luarea setului de produse din pagina la inchiderea ei
+         * */
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,6 +124,10 @@ public class MainPage extends JFrame {
 
         JButton submitOrder = new JButton(MessageDisplayer.getInstance().getMessage("submit_order"));
         submitOrder.setFont(new Font("Arial", Font.PLAIN, 35));
+        /**
+         * eveniment de apasare pe buton care salveaza sau actualizeaza o comanda
+         *
+         * */
         submitOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +191,10 @@ public class MainPage extends JFrame {
         isOccupiedCheckbox.setIcon(noIcon);
         isOccupiedCheckbox.setEnabled(false);
 
+        /**
+         * eveniment de schimbare a valorii din combobox
+         * modifica valorile din checkbox si din textfield sa reflecte starea si numarul de scaune pentru masa aleasa din combobox
+         * */
         tableCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -267,6 +282,9 @@ public class MainPage extends JFrame {
 
             JButton backButton = new JButton(MessageDisplayer.getInstance().getMessage("back_to_categories_button"));
             backButton.setFont(new Font("Arial", Font.PLAIN, 45));
+            /**
+             * eveniment de apasare pe butonul de inapoi care modifica panelul afisat
+             * */
             backButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -293,6 +311,11 @@ public class MainPage extends JFrame {
                 JButton productButton = new JButton(buttonText);
                 productButton.putClientProperty("product", product);
                 productButton.setFont(new Font("Arial", Font.PLAIN, 40));
+                /**
+                 * eveniment de apasare pe butonul unui produs individual
+                 * intai este afisat un pop-up message de confirmare a adaugarii produsului in cos
+                 * apoi se face adaugarea produsului sau incrementarea cantitatii in lista afisata
+                 * */
                 productButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

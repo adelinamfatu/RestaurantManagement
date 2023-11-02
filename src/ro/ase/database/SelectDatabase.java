@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * clasa care se ocupa cu comenzile de tip select din baza de date
+ * */
 public class SelectDatabase {
     private Connection connection;
 
@@ -16,6 +19,10 @@ public class SelectDatabase {
         this.connection = connection;
     }
 
+    /**
+     * metoda care returneaza o lista de produse dintr-o categorie anume
+     * @param categoryName - numele categoriei folosita in interogare
+     * */
     public List<Product> getProductDetailsByCategory(String categoryName) {
         List<Product> productDetails = new ArrayList<>();
 
@@ -44,6 +51,9 @@ public class SelectDatabase {
         return productDetails;
     }
 
+    /**
+     * metoda care returneaza informatii despre toate mesele din baza de date
+     * */
     public List<Table> getTables() {
         List<Table> tables = new ArrayList<>();
 
@@ -69,6 +79,9 @@ public class SelectDatabase {
         return tables;
     }
 
+    /**
+     * metoda care returneaza toate id-urile si numele produselor din baza de date
+     * */
     public Set<Product> getAllProductNamesAndIds() {
         Set<Product> productNamesAndIds = new HashSet<>();
         String selectQuery = "SELECT id, name FROM products";
@@ -88,6 +101,9 @@ public class SelectDatabase {
         return productNamesAndIds;
     }
 
+    /**
+     * metoda care returneaza numarul de comenzi din saptamana curenta
+     * */
     public int getWeekOrdersCount() {
         int ordersCount = 0;
         try {
@@ -117,6 +133,9 @@ public class SelectDatabase {
         return ordersCount;
     }
 
+    /**
+     * metoda care returneaza numele celui mai vandut produs
+     * */
     public String getMostSoldProduct() {
         String mostSoldProduct = null;
         try {
@@ -141,6 +160,9 @@ public class SelectDatabase {
         return mostSoldProduct;
     }
 
+    /**
+     * metoda care returneaza valoarea incasarilor din saptamana curenta
+     * */
     public double getWeekRevenue() {
         double revenue = 0.0;
         try {

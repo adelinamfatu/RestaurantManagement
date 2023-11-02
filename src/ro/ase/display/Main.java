@@ -11,10 +11,16 @@ import java.sql.Statement;
 
 public class Main {
     public static void main(String[] args) throws ClassNotFoundException {
+        /**
+         * deschiderea conexiunii cu baza de date
+         * */
         DatabaseConnection dbConnection = new DatabaseConnection("src/ro/ase/database/restaurant.sqlite");
         Connection connection = dbConnection.getConnection();
         UpdateDatabase updateDatabase = new UpdateDatabase(connection);
 
+        /**
+         * crearea sau actualizarea tabelelor bazei de date
+         * */
         try {
             Statement statement = connection.createStatement();
 
@@ -56,10 +62,17 @@ public class Main {
             e.printStackTrace();
         }
 
+        /**
+         * pornirea interfetei Swing
+         * */
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 MainPage mainPage = new MainPage(connection);
                 mainPage.setVisible(true);
+
+                /**
+                 * actualizarea datelor in baza de date la inchiderea aplicatiei
+                 * */
                 mainPage.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {

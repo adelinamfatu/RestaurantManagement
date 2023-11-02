@@ -1,5 +1,8 @@
 package ro.ase.classes;
 
+/**
+ * clasa Masa
+ * */
 public class Table {
     private int id;
     private int nbSeats;
@@ -29,9 +32,7 @@ public class Table {
         return isOccupied;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
 
     public int getNbSeats() {
         return nbSeats;

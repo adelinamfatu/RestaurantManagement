@@ -3,6 +3,9 @@ package ro.ase.classes;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
+/**
+ * clasa Produs
+ * */
 public class Product implements Comparable<Product> {
     private int id;
     private String name;
@@ -65,6 +68,9 @@ public class Product implements Comparable<Product> {
         return id;
     }
 
+    /**
+     * override-ul metodei equals folosit automat in contains
+     * */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,6 +84,9 @@ public class Product implements Comparable<Product> {
         return Objects.hash(name);
     }
 
+    /**
+     * override-ul metodei compareTo pentru compararea a 2 obiecte de tip Produs
+     * */
     @Override
     public int compareTo(Product otherProduct) {
         if (this.id < otherProduct.id) {

@@ -13,6 +13,9 @@ import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * clasa derivata din JFrame care reprezinta interfata pentru adaugarea de noi produse
+ * */
 public class NewProductPage extends JFrame {
     private JLabel nameLabel;
     private JTextField nameTF;
@@ -25,7 +28,7 @@ public class NewProductPage extends JFrame {
     private JLabel categoryLabel;
     private JComboBox categoryCB;
     private JButton addBtn;
-    private Set<Product> products = new HashSet<>();
+    private Set<Product> products;
     private Connection connection;
     private SelectDatabase selectDatabase;
 
@@ -38,6 +41,9 @@ public class NewProductPage extends JFrame {
         setResizable(false);
         setSize(600, 900);
 
+        /**
+         * adaugarea categoriilor dintr-un vector intr-un combobox
+         * */
         categoryCB = new JComboBox();
         Category[] categories = Category.values();
         for (Category category : categories) {
@@ -79,12 +85,18 @@ public class NewProductPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    /**
+                     * luarea datelor introduse in controalele grafice
+                     * */
                     String name = nameTF.getText();
                     String description = descriptionTF.getText();
                     float price = Float.parseFloat(priceTF.getText());
                     int amount = Integer.parseInt(amountTF.getText());
                     String selectedCategory = (String) categoryCB.getSelectedItem();
 
+                    /**
+                     * verificari pe datele din controale si aruncarea de exceptii definite de programator
+                     * */
                     if (name.isEmpty() || description.isEmpty() || priceTF.getText().isEmpty() || amountTF.getText().isEmpty() || selectedCategory.isEmpty()) {
                         throw new IllegalArgumentException(MessageDisplayer.getInstance().getMessage("no_data_exception"));
                     }
