@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * clasa derivata din JFrame care reprezinta interfata principala

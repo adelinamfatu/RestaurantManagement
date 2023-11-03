@@ -1,5 +1,7 @@
 package ro.ase.database;
 
+import ro.ase.classes.Order;
+import ro.ase.classes.OrderItem;
 import ro.ase.classes.Product;
 import ro.ase.classes.Table;
 
@@ -195,5 +197,48 @@ public class SelectDatabase {
             e.printStackTrace();
         }
         return revenue;
+    }
+
+    public Map<Product, Integer> getWeekProductsSold() {
+        Map<Product, Integer> productsSold = new HashMap<>();
+
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            Date weekStartDate = calendar.getTime();
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            Date weekEndDate = calendar.getTime();
+
+            String sql = "SELECT p.id, p.name, oi.quantity " +
+                    "FROM OrderItems oi " +
+                    "INNER JOIN Products p ON oi.productId = p.id " +
+                    "INNER JOIN Orders o ON oi.orderId = o.id " +
+                    "WHERE o.orderDate >= ? AND o.orderDate <= ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDate(1, new java.sql.Date(weekStartDate.getTime()));
+            preparedStatement.setDate(2, new java.sql.Date(weekEndDate.getTime()));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("id");
+                String productName = resultSet.getString("name");
+                int quantity = resultSet.getInt("quantity");
+
+                Product product = new Product(productId, productName);
+                if (productsSold.containsKey(product)) {
+                    int totalQuantity = productsSold.get(product);
+                    productsSold.put(product, totalQuantity + quantity);
+                } else {
+                    productsSold.put(product, quantity);
+                }
+            }
+
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productsSold;
     }
 }

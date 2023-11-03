@@ -1,10 +1,19 @@
 package ro.ase.display;
 
+import ro.ase.classes.Product;
 import ro.ase.database.SelectDatabase;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
+import java.util.Map;
 
 /**
  * clasa derivata din JFrame care reprezinta interfata pentru statistici
@@ -41,5 +50,58 @@ public class StatisticsPage extends JFrame {
         labelsPanel.add(mostOrderedProductLabel);
 
         add(labelsPanel, BorderLayout.CENTER);
+
+        /**
+         * meniu pop-up pe eveniment de click dreapta al mouse-ului
+         * */
+        JPopupMenu contextMenu = new JPopupMenu();
+        JMenuItem downloadReportMenuItem = new JMenuItem(MessageDisplayer.getInstance().getMessage("download_context_menu_option"));
+        Font menuItemFont = downloadReportMenuItem.getFont();
+        downloadReportMenuItem.setFont(new Font(menuItemFont.getName(), Font.BOLD, 25));
+        downloadReportMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Map<Product, Integer> productsSold = selectDatabase.getWeekProductsSold();
+
+                    String csvFileName = MessageDisplayer.getInstance().getMessage("raport_title");
+                    File csvFile = new File(csvFileName);
+                    FileWriter writer = new FileWriter(csvFile);
+                    writer.write("Produs,Cantitate\n");
+
+                    for (Map.Entry<Product, Integer> entry : productsSold.entrySet()) {
+                        String productName = entry.getKey().getName();
+                        int quantitySold = entry.getValue();
+                        String line = productName + "," + quantitySold + "\n";
+                        writer.write(line);
+                    }
+
+                    writer.close();
+
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setSelectedFile(csvFile);
+                    int userSelection = fileChooser.showSaveDialog(StatisticsPage.this);
+
+                    if (userSelection == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        csvFile.renameTo(selectedFile);
+                    } else {
+                        csvFile.delete();
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        contextMenu.add(downloadReportMenuItem);
+        contextMenu.setPreferredSize(new Dimension(400, 50));
+        labelsPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    contextMenu.show(labelsPanel, e.getX(), e.getY());
+                }
+            }
+        });
     }
 }
