@@ -56,7 +56,6 @@ public class MainPage extends JFrame {
 
         JButton addButton = new JButton(MessageDisplayer.getInstance().getMessage("open_new_product_page"));
         addButton.setFont(new Font("Arial", Font.BOLD, 30));
-        //addButton.setBorder(new RoundedBorder(50));
         addButton.setBackground(new Color(173, 216, 230));
         /**
          * deschiderea paginii de adaugare a unui nou produs la apasarea pe buton
@@ -163,6 +162,8 @@ public class MainPage extends JFrame {
                     orders.add(newOrder);
                     selectedTable.occupyTable();
                     isOccupiedCheckbox.setSelected(true);
+                    JOptionPane.showMessageDialog(MainPage.this,
+                            MessageDisplayer.getInstance().getMessage("update_order_message"));
                 }
 
                 Optional<Order> order = orders.stream().
@@ -188,6 +189,8 @@ public class MainPage extends JFrame {
                         }
                     }
                 }
+
+                orderListModel.clear();
             }
         });
 
@@ -334,7 +337,7 @@ public class MainPage extends JFrame {
                         product.getName() + "</b><br>" +
                         product.getDescription() + "<br>" +
                         product.getPrice() + " lei<br>" +
-                        (product.getCategory() == Category.BAUTURI ? product.getAmount() + " ml" : product.getAmount() + " gr") +
+                        (categoryName == Category.BAUTURI.toString() ? product.getAmount() + " ml" : product.getAmount() + " gr") +
                         "</center></html>";
 
                 JButton productButton = new JButton(buttonText);
@@ -393,30 +396,5 @@ public class MainPage extends JFrame {
         int green = 128 + random.nextInt(128);
         int blue = 128 + random.nextInt(128);
         return new Color(red, green, blue);
-    }
-
-    private static class RoundedBorder implements Border {
-
-        private int radius;
-
-
-        RoundedBorder(int radius) {
-            this.radius = radius;
-        }
-
-
-        public Insets getBorderInsets(Component c) {
-            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
-        }
-
-
-        public boolean isBorderOpaque() {
-            return true;
-        }
-
-
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.drawRoundRect(x, y, width-1, height-1, radius, radius);
-        }
     }
 }
