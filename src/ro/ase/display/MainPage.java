@@ -4,6 +4,8 @@ import ro.ase.database.SelectDatabase;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -258,6 +260,23 @@ public class MainPage extends JFrame {
 
         orderDisplay.setFont(new Font("Arial", Font.PLAIN, 35));
         orderDisplay.setModel(orderListModel);
+        orderDisplay.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int choice = JOptionPane.showConfirmDialog(MainPage.this,
+                        MessageDisplayer.getInstance().getMessage("delete_order_item_message"),
+                        MessageDisplayer.getInstance().getMessage("delete_order_item_title"),
+                        JOptionPane.YES_NO_OPTION);
+                if (choice == JOptionPane.YES_OPTION) {
+                    int selectedIndex = orderDisplay.getSelectedIndex();
+                    if (!e.getValueIsAdjusting()) {
+                        if (selectedIndex != -1) {
+                            orderListModel.remove(selectedIndex);
+                        }
+                    }
+                }
+            }
+        });
         JScrollPane ordersPane = new JScrollPane(orderDisplay);
         constraints.gridx = 2;
         constraints.gridy = 0;
