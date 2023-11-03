@@ -54,6 +54,8 @@ public class MainPage extends JFrame {
 
         JButton addButton = new JButton(MessageDisplayer.getInstance().getMessage("open_new_product_page"));
         addButton.setFont(new Font("Arial", Font.BOLD, 30));
+        //addButton.setBorder(new RoundedBorder(50));
+        addButton.setBackground(new Color(173, 216, 230));
         /**
          * deschiderea paginii de adaugare a unui nou produs la apasarea pe buton
          * luarea setului de produse din pagina la inchiderea ei
@@ -75,6 +77,7 @@ public class MainPage extends JFrame {
 
         JButton statisticsButton = new JButton(MessageDisplayer.getInstance().getMessage("open_statistics_page"));
         statisticsButton.setFont(new Font("Arial", Font.BOLD, 30));
+        statisticsButton.setBackground(new Color(173, 216, 230));
         statisticsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,6 +99,8 @@ public class MainPage extends JFrame {
 
         for (Category category : Category.values()) {
             JButton categoryButton = new JButton(category.toString());
+            Color randomColor = getRandomColor();
+            categoryButton.setBackground(randomColor);
             categoryButton.setFont(buttonFont);
             categoryButton.addActionListener(new CategoryButtonActionListener(category.toString()));
             categoryPanel.add(categoryButton);
@@ -116,18 +121,20 @@ public class MainPage extends JFrame {
 
         tableCombobox = new JComboBox<>();
         tableCombobox.setFont(new Font("Arial", Font.PLAIN, 35));
+        tableCombobox.setBackground(new Color(173, 216, 230));
         tables = selectDatabase.getTables();
         for (Table table : tables) {
             tableCombobox.addItem(table.getName());
         }
 
-        JButton submitOrder = new JButton(MessageDisplayer.getInstance().getMessage("submit_order"));
-        submitOrder.setFont(new Font("Arial", Font.PLAIN, 35));
+        JButton submitOrderButton = new JButton(MessageDisplayer.getInstance().getMessage("submit_order"));
+        submitOrderButton.setFont(new Font("Arial", Font.PLAIN, 35));
+        submitOrderButton.setBackground(new Color(173, 216, 230));
         /**
          * eveniment de apasare pe buton care salveaza sau actualizeaza o comanda
          *
          * */
-        submitOrder.addActionListener(new ActionListener() {
+        submitOrderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedTableName = (String) tableCombobox.getSelectedItem();
@@ -189,6 +196,7 @@ public class MainPage extends JFrame {
         isOccupiedCheckbox.setSelectedIcon(yesIcon);
         isOccupiedCheckbox.setIcon(noIcon);
         isOccupiedCheckbox.setEnabled(false);
+        isOccupiedCheckbox.setSelected(!tables.get(0).isOccupied());
 
         /**
          * eveniment de schimbare a valorii din combobox
@@ -215,6 +223,7 @@ public class MainPage extends JFrame {
         nbSeatsTf = new JTextField(5);
         nbSeatsTf.setFont(new Font("Arial", Font.PLAIN, 35));
         nbSeatsTf.setEditable(false);
+        nbSeatsTf.setText(String.valueOf(tables.get(0).getNbSeats()));
 
         int gridxForLabels = 0;
         int gridxForControls = 1;
@@ -245,7 +254,7 @@ public class MainPage extends JFrame {
         constraints.gridy = 3;
         constraints.gridx = gridxForControls;
         constraints.gridheight = 3;
-        controlPanel.add(submitOrder, constraints);
+        controlPanel.add(submitOrderButton, constraints);
 
         orderDisplay.setFont(new Font("Arial", Font.PLAIN, 35));
         orderDisplay.setModel(orderListModel);
@@ -281,6 +290,7 @@ public class MainPage extends JFrame {
 
             JButton backButton = new JButton(MessageDisplayer.getInstance().getMessage("back_to_categories_button"));
             backButton.setFont(new Font("Arial", Font.PLAIN, 45));
+            backButton.setBackground(new Color(173, 216, 230));
             /**
              * eveniment de apasare pe butonul de inapoi care modifica panelul afisat
              * */
@@ -305,11 +315,14 @@ public class MainPage extends JFrame {
                         product.getName() + "</b><br>" +
                         product.getDescription() + "<br>" +
                         product.getPrice() + " lei<br>" +
-                        product.getAmount() + " gr</center></html>";
+                        (product.getCategory() == Category.BAUTURI ? product.getAmount() + " ml" : product.getAmount() + " gr") +
+                        "</center></html>";
 
                 JButton productButton = new JButton(buttonText);
                 productButton.putClientProperty("product", product);
                 productButton.setFont(new Font("Arial", Font.PLAIN, 40));
+                Color randomColor = getRandomColor();
+                productButton.setBackground(randomColor);
                 /**
                  * eveniment de apasare pe butonul unui produs individual
                  * intai este afisat un pop-up message de confirmare a adaugarii produsului in cos
@@ -352,6 +365,39 @@ public class MainPage extends JFrame {
 
             flipPanel.add(productsPanel, categoryName);
             cardLayout.show(flipPanel, categoryName);
+        }
+    }
+
+    private Color getRandomColor() {
+        Random random = new Random();
+        int red = 128 + random.nextInt(128);
+        int green = 128 + random.nextInt(128);
+        int blue = 128 + random.nextInt(128);
+        return new Color(red, green, blue);
+    }
+
+    private static class RoundedBorder implements Border {
+
+        private int radius;
+
+
+        RoundedBorder(int radius) {
+            this.radius = radius;
+        }
+
+
+        public Insets getBorderInsets(Component c) {
+            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+        }
+
+
+        public boolean isBorderOpaque() {
+            return true;
+        }
+
+
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            g.drawRoundRect(x, y, width-1, height-1, radius, radius);
         }
     }
 }

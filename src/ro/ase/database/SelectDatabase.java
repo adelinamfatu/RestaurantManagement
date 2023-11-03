@@ -199,6 +199,9 @@ public class SelectDatabase {
         return revenue;
     }
 
+    /**
+     * metoda care returneaza perechi cheie-valoare de produse si cantitatea vanduta in saptamana curenta
+     * */
     public Map<Product, Integer> getWeekProductsSold() {
         Map<Product, Integer> productsSold = new HashMap<>();
 

@@ -45,6 +45,7 @@ public class NewProductPage extends JFrame {
          * adaugarea categoriilor dintr-un vector intr-un combobox
          * */
         categoryCB = new JComboBox();
+        categoryCB.setBackground(new Color(173, 216, 230));
         Category[] categories = Category.values();
         for (Category category : categories) {
             categoryCB.addItem(category.toString());
@@ -81,6 +82,7 @@ public class NewProductPage extends JFrame {
 
         addBtn = new JButton("Adauga produs");
         addBtn.setFont(font);
+        addBtn.setBackground(new Color(173, 216, 230));
         addBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
